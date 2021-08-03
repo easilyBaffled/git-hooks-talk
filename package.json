@@ -2,10 +2,23 @@
   "name": "git-hooks-talk",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "prepare": "husky install"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "husky": "^7.0.1",
+    "lint-staged": "^11.1.1",
+    "mdx-deck": "^4.1.1",
+    "prettier": "^2.3.2"
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix --ext .js ./src/",
+    "*.{js,css,md,mdx}": "prettier --write"
+  }
 }

@@ -1,0 +1,96 @@
+## Something to Relate To
+
+So about every month you have probably seen
+`"Plan functions are being phased out and moving to the Subscription Service"`
+a can we have kicking down the road for longer than I think most people have been a part of this company.
+We can discuss the reasoning and ramifications of that some other time. Today I'd like to illuminate some of the tooling around it.
+
+---
+
+## ESLint - `no-restricted-syntax`
+
+This error is being produced by `eslint` with a very particular rule `"no-restricted-syntax"`.
+What makes `"no-restricted-syntax"` is that it lets us define a specific AST selector to disallow.
+For Example:
+
+```json
+{
+    "selector": "MemberExpression[object.name=/describe|it/][property.name='only']",
+    "message": "Do not commit `describe.only` or `it.only` it will invalidate our test results."
+}
+```
+
+## It's quite useful for making hyper specific rules like what we to catch using "Plan" and I guess soon "Subscription" as that ceased to be part of our project.
+
+## Transition to Commit
+
+If you have your editor configured correctly, it should pick up our eslint configuration file and highlight the issue. It'll show you the issue, but it's not going to enforce it.
+Which is why you only see `"Plan functions are being phased out and moving to the Subscription Service"` when you commit.
+
+---
+
+## Hooks
+
+For that we Git Hooks
+Hooks are tools provided by `git` that let us subscribe to key points in the git lifecycle.
+We have seen similar lifecycle hooks in Angular `ngOnChanges`, `ngOnInit`, `ngDoCheck`, `ngOnDestroy` and with Cypress's `before`, `beforeAll`, `afterAll`
+So just like those the Git Hooks let us run specific scripts based on certain events around the git process.
+
+---
+
+## Pre-Commit
+
+Run when you run `git commit` before the commit actually takes place
+We run `eslint --fix...` with the `pre-commit` hook, which means it runs _before_ the commit. If anything in the `pre-commit` hook fails, then the commit doesn't take place.
+Soon we're going to add `prettier` as well so that we're all on the same page stylistically
+If we weren't blessed with our pipeline we would also be running our Cypress and Unit tests in this hook (because we shouldn't commit bad code)
+We could also use this to reject a commit that had too many changes in it to create a safer revert policy (`git bisect` anyone?)
+
+---
+
+## The Rest of The Bunch - `prepare-commit-msg`
+
+### `prepare-commit-msg`
+
+This is also run in response to `git commit` but specifically related to the commit message.
+We can use this hook to generate a default commit message like maybe including a checklist pulled from the original issue
+
+---
+
+## The Rest of The Bunch - `commit-msg`
+
+### `commit-msg`
+
+This runs _after_ a commit message has been submitted
+This is a good place to validate the commit message (once we have established a standard...commitizen) or do things like spell check ...which is nice
+We can use this to build a change log, so I don't have to write one manually
+
+---
+
+## Other Useful Hooks to Explore
+
+### `post-commit`
+
+### `post-checkout`
+
+### `pre-rebase`
+
+The `post-` commits are used for messaging, for example we could tie into slack, or clean up some files.
+I will let you explore the rest
+
+---
+
+## `husky`
+
+[Husky - Git hooks](https://typicode.github.io/husky/#/)
+There's a bit of an issue with git hooks. Well several issues, but one of the main ones being that hooks are only local. So you can't commit and share them. Which is where Huskey comes it.
+Husky is a Node Module that allows us to wire up npm scripts to the git hooks. Which allows us to run `npx stylelint "**/*.css"` before we commit
+But there's still one more piece
+
+---
+
+## Lint-Staged
+
+## You see git hooks and by extension `husky` are pretty dumb, they run on everything, every time. So we have `lint-staged`, to keep our scripts focused, meaning our scripts will _only_ run on the files we have worked on.
+
+So when you are looking for something being run in our `pre-commit` checkout `package.json` `lint-staged:`
